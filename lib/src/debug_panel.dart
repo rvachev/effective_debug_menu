@@ -26,60 +26,73 @@ class DebugPanel extends StatefulWidget {
 
 class _DebugPanelState extends State<DebugPanel> {
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey();
+  final GlobalKey<NavigatorState> _navigatorKey = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      endDrawer: Drawer(
-        child: SafeArea(
-          child: Container(
-            color: Colors.white,
-            child: Column(
-              children: [
-                EnvironmentDropdown(
-                  selectedEnvironment: widget.selectedEnvironment,
-                  items: widget.environments,
-                  onEnvironmentChanged: (environment) {
-                    if (environment == widget.selectedEnvironment) return;
-                    if (widget.onEnvironmentChanged != null) {
-                      widget.onEnvironmentChanged!(environment);
-                      ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-                          .showSnackBar(const RestartAppSnackBar());
-                      Scaffold.of(_scaffoldKey.currentContext!)
-                          .closeEndDrawer();
-                    }
-                  },
+    return Navigator(
+        key: _navigatorKey,
+        onGenerateRoute: (settings) {
+          return MaterialPageRoute(builder: (context) {
+            return Scaffold(
+              endDrawer: Drawer(
+                child: SafeArea(
+                  child: Container(
+                    color: Colors.white,
+                    child: Column(
+                      children: [
+                        EnvironmentDropdown(
+                          selectedEnvironment: widget.selectedEnvironment,
+                          items: widget.environments,
+                          onEnvironmentChanged: (environment) {
+                            if (environment == widget.selectedEnvironment) {
+                              return;
+                            }
+                            if (widget.onEnvironmentChanged != null) {
+                              widget.onEnvironmentChanged!(environment);
+                              ScaffoldMessenger.of(_scaffoldKey.currentContext!)
+                                  .showSnackBar(const RestartAppSnackBar());
+                              Scaffold.of(_scaffoldKey.currentContext!)
+                                  .closeEndDrawer();
+                            }
+                          },
+                        ),
+                        ElevatedButton(
+                          onPressed: _showLogsDialog,
+                          child: const Text('VIEW LOGS'),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-                ElevatedButton(
-                  onPressed: _showLogsDialog,
-                  child: const Text('VIEW LOGS'),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-      endDrawerEnableOpenDragGesture: false,
-      body: SafeArea(
-        key: _scaffoldKey,
-        child: Stack(
-          children: [
-            widget.child,
-            Positioned(
-                top: 16,
-                right: 16,
-                child: DrawerGestureDetector(
-                  callback: _showDebugPanel,
-                )),
-          ],
-        ),
-      ),
-    );
+              ),
+              endDrawerEnableOpenDragGesture: false,
+              body: Stack(
+                key: _scaffoldKey,
+                children: [
+                  widget.child,
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: SizedBox(
+                      height: 50,
+                      width: 50,
+                      child: DrawerGestureDetector(
+                        callback: _showDebugPanel,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          });
+        });
   }
 
   void _showLogsDialog() {
+    if (_navigatorKey.currentContext == null) return;
     showDialog(
-        context: context,
+        context: _navigatorKey.currentContext!,
         builder: (context) {
           final logs = LogRecordsContainer.instance.logs;
           return Dialog(

@@ -7,16 +7,12 @@ class DrawerGestureDetector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 50,
-      height: 50,
-      child: GestureDetector(
-        onLongPressMoveUpdate: (details) {
-          if (details.offsetFromOrigin.dy > 70) {
-            callback();
-          }
-        },
-      ),
+    return GestureDetector(
+      onLongPressMoveUpdate: (details) {
+        if (details.offsetFromOrigin.dy > 70) {
+          callback();
+        }
+      },
     );
   }
 }
