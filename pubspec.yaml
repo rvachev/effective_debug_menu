@@ -1,11 +1,11 @@
 name: effective_debug_menu
 description: A new Flutter package project.
-version: 0.0.1
-homepage: 'none'
-publish_to: 'none'
+version: 0.0.2
+homepage: "none"
+publish_to: "none"
 
 environment:
-  sdk: '>=2.18.5 <3.0.0'
+  sdk: ">=2.18.5 <3.0.0"
   flutter: ">=1.17.0"
 
 dependencies:
@@ -13,7 +13,9 @@ dependencies:
     sdk: flutter
   dio: ^4.0.6
   effective_dio_interceptor:
-    git: https://github.com/rvachev/effective_dio_interceptor
+    git:
+      url: https://github.com/rvachev/effective_dio_interceptor
+      version: ^0.0.2
 
 dev_dependencies:
   flutter_test:

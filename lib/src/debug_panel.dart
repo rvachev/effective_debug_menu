@@ -1,12 +1,24 @@
+import 'package:effective_debug_menu/src/network/environment/ui/environment_dropdown.dart';
+import 'package:effective_debug_menu/src/network/environment/ui/restart_app_snackbar.dart';
 import 'package:effective_debug_menu/src/network/logger/log_records_container.dart';
 import 'package:effective_debug_menu/src/ui/drawer_gesture_detector.dart';
 import 'package:effective_debug_menu/src/ui/logs_list_view.dart';
 import 'package:flutter/material.dart';
 
+import 'network/environment/models/environment_item.dart';
+
 class DebugPanel extends StatefulWidget {
+  final EnvironmentItem selectedEnvironment;
+  final List<EnvironmentItem> environments;
+  final void Function(EnvironmentItem item)? onEnvironmentChanged;
   final Widget child;
 
-  const DebugPanel({super.key, required this.child});
+  const DebugPanel(
+      {super.key,
+      required this.selectedEnvironment,
+      this.environments = const [],
+      this.onEnvironmentChanged,
+      required this.child});
 
   @override
   State<DebugPanel> createState() => _DebugPanelState();
@@ -20,15 +32,30 @@ class _DebugPanelState extends State<DebugPanel> {
     return Scaffold(
       endDrawer: Drawer(
         child: SafeArea(
-          child: Column(
-            children: [
-              Container(
-                  color: Colors.white,
-                  child: ElevatedButton(
-                    onPressed: _showLogsDialog,
-                    child: const Text('VIEW LOGS'),
-                  )),
-            ],
+          child: Container(
+            color: Colors.white,
+            child: Column(
+              children: [
+                EnvironmentDropdown(
+                  selectedEnvironment: widget.selectedEnvironment,
+                  items: widget.environments,
+                  onEnvironmentChanged: (environment) {
+                    if (environment == widget.selectedEnvironment) return;
+                    if (widget.onEnvironmentChanged != null) {
+                      widget.onEnvironmentChanged!(environment);
+                      ScaffoldMessenger.of(_scaffoldKey.currentContext!)
+                          .showSnackBar(const RestartAppSnackBar());
+                      Scaffold.of(_scaffoldKey.currentContext!)
+                          .closeEndDrawer();
+                    }
+                  },
+                ),
+                ElevatedButton(
+                  onPressed: _showLogsDialog,
+                  child: const Text('VIEW LOGS'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
