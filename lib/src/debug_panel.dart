@@ -8,14 +8,14 @@ import 'package:flutter/material.dart';
 import 'network/environment/models/environment_item.dart';
 
 class DebugPanel extends StatefulWidget {
-  final EnvironmentItem selectedEnvironment;
+  final EnvironmentItem? selectedEnvironment;
   final List<EnvironmentItem> environments;
   final void Function(EnvironmentItem item)? onEnvironmentChanged;
   final Widget child;
 
   const DebugPanel(
       {super.key,
-      required this.selectedEnvironment,
+      this.selectedEnvironment,
       this.environments = const [],
       this.onEnvironmentChanged,
       required this.child});
@@ -41,22 +41,25 @@ class _DebugPanelState extends State<DebugPanel> {
                     color: Colors.white,
                     child: Column(
                       children: [
-                        EnvironmentDropdown(
-                          selectedEnvironment: widget.selectedEnvironment,
-                          items: widget.environments,
-                          onEnvironmentChanged: (environment) {
-                            if (environment == widget.selectedEnvironment) {
-                              return;
-                            }
-                            if (widget.onEnvironmentChanged != null) {
-                              widget.onEnvironmentChanged!(environment);
-                              ScaffoldMessenger.of(_scaffoldKey.currentContext!)
-                                  .showSnackBar(const RestartAppSnackBar());
-                              Scaffold.of(_scaffoldKey.currentContext!)
-                                  .closeEndDrawer();
-                            }
-                          },
-                        ),
+                        if (widget.selectedEnvironment != null &&
+                            widget.environments.isNotEmpty)
+                          EnvironmentDropdown(
+                            selectedEnvironment: widget.selectedEnvironment!,
+                            items: widget.environments,
+                            onEnvironmentChanged: (environment) {
+                              if (environment == widget.selectedEnvironment) {
+                                return;
+                              }
+                              if (widget.onEnvironmentChanged != null) {
+                                widget.onEnvironmentChanged!(environment);
+                                ScaffoldMessenger.of(
+                                        _scaffoldKey.currentContext!)
+                                    .showSnackBar(const RestartAppSnackBar());
+                                Scaffold.of(_scaffoldKey.currentContext!)
+                                    .closeEndDrawer();
+                              }
+                            },
+                          ),
                         ElevatedButton(
                           onPressed: _showLogsDialog,
                           child: const Text('VIEW LOGS'),
