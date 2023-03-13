@@ -1,11 +1,11 @@
-import 'package:effective_debug_menu/src/extensions/log_message_type_x.dart';
-import 'package:effective_dio_interceptor/effective_dio_interceptor.dart';
+import 'package:effective_debug_menu/src/extensions/log_type_x.dart';
+import 'package:effective_debug_menu/src/logs/debug_log.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class LogsListView extends StatelessWidget {
-  final List<LogMessage> logs;
+  final List<DebugLog> logs;
 
   const LogsListView({super.key, required this.logs});
 
@@ -25,7 +25,7 @@ class LogsListView extends StatelessWidget {
 }
 
 class _LogItem extends StatelessWidget {
-  final LogMessage log;
+  final DebugLog log;
 
   const _LogItem({required this.log});
 
@@ -44,7 +44,7 @@ class _LogItem extends StatelessWidget {
           color: log.type.color,
           child: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Text(log.toString()),
+            child: Text(log.message.toString()),
           ),
         ),
       ),

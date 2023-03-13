@@ -1,17 +1,15 @@
+import 'package:effective_debug_menu/src/logs/debug_log.dart';
 import 'package:effective_dio_interceptor/effective_dio_interceptor.dart';
-import 'package:flutter/material.dart';
 
 extension LogMessageTypeX on LogMessageType {
-  Color get color {
+  LogType toLogType() {
     switch (this) {
       case LogMessageType.error:
-        return Colors.red.withOpacity(0.3);
+        return LogType.error;
       case LogMessageType.request:
-        return Colors.yellow.withOpacity(0.3);
+        return LogType.info;
       case LogMessageType.response:
-        return Colors.green.withOpacity(0.3);
-      default:
-        return Colors.white;
+        return LogType.debug;
     }
   }
 }
