@@ -79,13 +79,14 @@ class _DebugPanelState extends State<DebugPanel> {
                 children: [
                   widget.child,
                   Positioned(
-                    top: 16,
                     right: 16,
-                    child: SizedBox(
-                      height: 50,
-                      width: 50,
-                      child: DrawerGestureDetector(
-                        callback: _showDebugPanel,
+                    child: SafeArea(
+                      child: SizedBox(
+                        height: 50,
+                        width: 50,
+                        child: DrawerGestureDetector(
+                          callback: _showDebugPanel,
+                        ),
                       ),
                     ),
                   ),
