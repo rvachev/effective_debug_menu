@@ -12,9 +12,20 @@ import 'logs/debug_log.dart';
 import 'network/environment/models/environment_item.dart';
 
 class DebugPanel extends StatefulWidget {
+  /// Selected [EnvironmentItem] which is used for displaying current item in dropdown
   final EnvironmentItem? selectedEnvironment;
+
+  /// List of [EnvironmentItem] which is used for displaying whole list of possible items
+  /// if is empty dropdown won't be displayed
   final List<EnvironmentItem> environments;
+
+  /// Callback which called when new [EnvironmentItem] selected
   final void Function(EnvironmentItem item)? onEnvironmentChanged;
+
+  /// A widget which displayed below [EnvironmentDropdown] and "View logs" button
+  final Widget? additionalItem;
+
+  /// child (usually whole app) to place debug panel on the screen
   final Widget child;
 
   const DebugPanel(
@@ -22,6 +33,7 @@ class DebugPanel extends StatefulWidget {
       this.selectedEnvironment,
       this.environments = const [],
       this.onEnvironmentChanged,
+      this.additionalItem,
       required this.child});
 
   @override
@@ -43,32 +55,38 @@ class _DebugPanelState extends State<DebugPanel> {
                 child: SafeArea(
                   child: Container(
                     color: Colors.white,
-                    child: Column(
-                      children: [
-                        if (widget.selectedEnvironment != null &&
-                            widget.environments.isNotEmpty)
-                          EnvironmentDropdown(
-                            selectedEnvironment: widget.selectedEnvironment!,
-                            items: widget.environments,
-                            onEnvironmentChanged: (environment) {
-                              if (environment == widget.selectedEnvironment) {
-                                return;
-                              }
-                              if (widget.onEnvironmentChanged != null) {
-                                widget.onEnvironmentChanged!(environment);
-                                ScaffoldMessenger.of(
-                                        _scaffoldKey.currentContext!)
-                                    .showSnackBar(const RestartAppSnackBar());
-                                Scaffold.of(_scaffoldKey.currentContext!)
-                                    .closeEndDrawer();
-                              }
-                            },
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          if (widget.selectedEnvironment != null &&
+                              widget.environments.isNotEmpty)
+                            EnvironmentDropdown(
+                              selectedEnvironment: widget.selectedEnvironment!,
+                              items: widget.environments,
+                              onEnvironmentChanged: (environment) {
+                                if (environment == widget.selectedEnvironment) {
+                                  return;
+                                }
+                                if (widget.onEnvironmentChanged != null) {
+                                  widget.onEnvironmentChanged!(environment);
+                                  ScaffoldMessenger.of(
+                                          _scaffoldKey.currentContext!)
+                                      .showSnackBar(const RestartAppSnackBar());
+                                  Scaffold.of(_scaffoldKey.currentContext!)
+                                      .closeEndDrawer();
+                                }
+                              },
+                            ),
+                          ElevatedButton(
+                            onPressed: _showLogsDialog,
+                            child: const Text('VIEW LOGS'),
                           ),
-                        ElevatedButton(
-                          onPressed: _showLogsDialog,
-                          child: const Text('VIEW LOGS'),
-                        ),
-                      ],
+                          if (widget.additionalItem != null) ...[
+                            const Divider(),
+                            widget.additionalItem!
+                          ]
+                        ],
+                      ),
                     ),
                   ),
                 ),
