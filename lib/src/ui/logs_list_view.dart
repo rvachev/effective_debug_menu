@@ -12,7 +12,6 @@ class LogsListView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
-      reverse: true,
       itemCount: logs.length,
       itemBuilder: (context, i) {
         return _LogItem(log: logs[i]);
@@ -34,7 +33,7 @@ class _LogItem extends StatelessWidget {
     return Material(
       child: InkWell(
         onLongPress: () async {
-          await Clipboard.setData(ClipboardData(text: log.toString()));
+          await Clipboard.setData(ClipboardData(text: log.message.toString()));
           Fluttertoast.showToast(
             msg: 'Log has been copied to clipboard',
             toastLength: Toast.LENGTH_LONG,

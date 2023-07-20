@@ -4,5 +4,5 @@ class DebugLog {
   final Object message;
   final LogType type;
 
-  DebugLog({required this.message, required this.type});
+  const DebugLog({required this.message, required this.type});
 }

@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class DrawerGestureDetector extends StatelessWidget {
@@ -7,11 +8,18 @@ class DrawerGestureDetector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPressMoveUpdate: (details) {
-        if (details.offsetFromOrigin.dy > 70) {
-          callback();
-        }
+    return RawGestureDetector(
+      gestures: {
+        LongPressGestureRecognizer:
+            GestureRecognizerFactoryWithHandlers<LongPressGestureRecognizer>(
+                () => LongPressGestureRecognizer(),
+                (LongPressGestureRecognizer instance) {
+          instance.onLongPressMoveUpdate = (details) {
+            if (details.offsetFromOrigin.dy > 70) {
+              callback();
+            }
+          };
+        }),
       },
     );
   }

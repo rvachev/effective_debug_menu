@@ -11,6 +11,16 @@ import 'package:flutter/material.dart';
 import 'logs/debug_log.dart';
 import 'network/environment/models/environment_item.dart';
 
+enum OpenGestureAlignment {
+  topLeft(alignment: Alignment.topLeft),
+  topCenter(alignment: Alignment.topCenter),
+  topRight(alignment: Alignment.topRight);
+
+  const OpenGestureAlignment({required this.alignment});
+
+  final Alignment alignment;
+}
+
 class DebugPanel extends StatefulWidget {
   /// Selected [EnvironmentItem] which is used for displaying current item in dropdown
   final EnvironmentItem? selectedEnvironment;
@@ -25,16 +35,22 @@ class DebugPanel extends StatefulWidget {
   /// A widget which displayed below [EnvironmentDropdown] and "View logs" button
   final Widget? additionalItem;
 
+  /// An aligment for start gesture position
+  /// May be only on the top of the screen
+  final OpenGestureAlignment openGestureAlignment;
+
   /// child (usually whole app) to place debug panel on the screen
   final Widget child;
 
-  const DebugPanel(
-      {super.key,
-      this.selectedEnvironment,
-      this.environments = const [],
-      this.onEnvironmentChanged,
-      this.additionalItem,
-      required this.child});
+  const DebugPanel({
+    super.key,
+    this.selectedEnvironment,
+    this.environments = const [],
+    this.onEnvironmentChanged,
+    this.additionalItem,
+    this.openGestureAlignment = OpenGestureAlignment.topLeft,
+    required this.child,
+  });
 
   @override
   State<DebugPanel> createState() => _DebugPanelState();
@@ -96,14 +112,17 @@ class _DebugPanelState extends State<DebugPanel> {
                 key: _scaffoldKey,
                 children: [
                   widget.child,
-                  Positioned(
-                    right: 16,
+                  Align(
+                    alignment: widget.openGestureAlignment.alignment,
                     child: SafeArea(
-                      child: SizedBox(
-                        height: 50,
-                        width: 50,
-                        child: DrawerGestureDetector(
-                          callback: _showDebugPanel,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: SizedBox(
+                          height: 50,
+                          width: 50,
+                          child: DrawerGestureDetector(
+                            callback: _showDebugPanel,
+                          ),
                         ),
                       ),
                     ),
@@ -116,7 +135,7 @@ class _DebugPanelState extends State<DebugPanel> {
   }
 
   void _showLogsDialog() async {
-    if (_navigatorKey.currentContext == null) return;
+    if (_scaffoldKey.currentContext == null) return;
     final logs = LogRecordsContainer.instance.logs
         .map((LogMessage log) =>
             DebugLog(message: log.toString(), type: log.type.toLogType()))
@@ -124,15 +143,36 @@ class _DebugPanelState extends State<DebugPanel> {
     final incomingLogs = DebugMenuLogContainer.messages;
     logs.addAll(incomingLogs);
     showDialog(
-        context: _navigatorKey.currentContext!,
+        context: _scaffoldKey.currentContext!,
+        barrierDismissible: false,
         builder: (context) {
-          return Dialog(
-            insetPadding: const EdgeInsets.all(20.0),
-            child: Container(
-                color: Colors.white,
-                child: LogsListView(
-                  logs: logs,
-                )),
+          return WillPopScope(
+            onWillPop: () async {
+              Navigator.of(context).pop();
+              return false;
+            },
+            child: Dialog(
+              insetPadding: const EdgeInsets.all(20.0),
+              child: Container(
+                  color: Colors.white,
+                  child: Stack(
+                    children: [
+                      LogsListView(
+                        logs: logs,
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        left: 0,
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text('Закрыть'),
+                        ),
+                      )
+                    ],
+                  )),
+            ),
           );
         });
   }
